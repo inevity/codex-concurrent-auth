@@ -89,17 +89,6 @@ The `.local` file is always resolved next to the real script (via `readlink -f "
 3. Fails fast with a clear message if `OPENAI_API_KEY` or `provider_base_url` is missing.
 4. Builds `model_providers.<provider_id>={name=..., base_url=..., env_key="OPENAI_API_KEY", wire_api="responses"}` and execs `codex -c ...`.
 
-## Security
-
-- Never commit `.local` files; `*.local` is git-ignored.
-- `*.shbackup` is ignored as well: backups of old scripts may still contain secrets.
-- If a key ever reaches a remote, rotate it immediately. Deleting the file later does not remove it from git history; use `git filter-repo` or BFG.
-- Check before pushing:
-
-```bash
-git diff --cached | grep -iE 'sk-|api[_-]?key|password|token'
-```
-
 ## Adding Another Provider
 
 Copy the script, change `provider_id`, `provider_name`, and add a matching `.local` file for its URL/key/proxy. One script plus one `.local` per account keeps providers isolated even though all of them use the `OPENAI_API_KEY` variable name. Typical targets: CLIProxyAPI, cli2proxy, sub2api.
