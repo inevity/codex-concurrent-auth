@@ -1,0 +1,3 @@
+: "${CODEX_PROFILE:=your-profile}"
+export provider_base_url="https://your-proxy.example.com/v1"
+export OPENAI_API_KEY="sk-replace-with-your-key"
