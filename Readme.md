@@ -1,6 +1,6 @@
-# codex CLIProxyAPI Launcher
+# Codex CLI Launcher
 
-Wrapper that starts Codex CLI against a CLIProxyAPI provider while keeping API keys and private URLs out of the repository.
+Launcher pattern for Codex CLI that keeps API keys and private URLs out of the repository. It works with any OpenAI-compatible provider or proxy (CLIProxyAPI, cli2proxy, sub2api, ...); `codex-cliproxyapi.sh` is the included example.
 
 ## Two Ways to Run Codex
 
@@ -19,7 +19,7 @@ For multiple OAuth accounts, log out and log back in manually, or use an account
 
 ### API providers
 
-Use a launcher script like `codex-cliproxyapi.sh` for CLIProxyAPI, cli2proxy, sub2api and similar services. The provider is injected per invocation (`-c model_provider=...`), so your OAuth login is never touched.
+Use one launcher script per provider or account; `codex-cliproxyapi.sh` is the included example. The provider is injected per invocation (`-c model_provider=...`), so your OAuth login is never touched.
 
 For multiple API accounts or providers, create one script plus one `.local` file per account:
 
@@ -41,12 +41,14 @@ CODEX_PROFILE=fast ./codex-cliproxyapi.sh  # same API account, different profile
 
 | File | Committed | Purpose |
 |---|---|---|
-| `codex-cliproxyapi.sh` | yes | launcher: sources local values, builds the provider override, execs `codex` |
-| `codex-cliproxyapi.sh.local.example` | yes | template for machine-local values |
-| `codex-cliproxyapi.sh.local` | no (git-ignored) | your API key, proxy URL, default profile |
+| `codex-<provider>.sh` | yes | one launcher per provider/account: sources local values, builds the provider override, execs `codex` (example: `codex-cliproxyapi.sh`) |
+| `codex-<provider>.sh.local.example` | yes | template for machine-local values (example: `codex-cliproxyapi.sh.local.example`) |
+| `codex-<provider>.sh.local` | no (git-ignored) | API key, provider URL, default profile |
 | `.gitignore` | yes | ignores `*.local` and `*.shbackup` |
 
 ## Setup
+
+Example using the included CLIProxyAPI launcher:
 
 ```bash
 cp codex-cliproxyapi.sh.local.example codex-cliproxyapi.sh.local
@@ -54,7 +56,7 @@ chmod 600 codex-cliproxyapi.sh.local
 $EDITOR codex-cliproxyapi.sh.local
 ```
 
-Fill in `codex-cliproxyapi.sh.local`:
+Fill in `codex-cliproxyapi.sh.local` (or the matching `.local` of your own launcher):
 
 ```bash
 : "${CODEX_PROFILE:=your-profile}"
@@ -85,7 +87,7 @@ The `.local` file is always resolved next to the real script (via `readlink -f "
 1. Resolves its own absolute path.
 2. Sources `<script>.local` with `set -a` (all assignments are exported).
 3. Fails fast with a clear message if `OPENAI_API_KEY` or `provider_base_url` is missing.
-4. Builds `model_providers.cliproxyapi={name=..., base_url=..., env_key="OPENAI_API_KEY", wire_api="responses"}` and execs `codex -c ...`.
+4. Builds `model_providers.<provider_id>={name=..., base_url=..., env_key="OPENAI_API_KEY", wire_api="responses"}` and execs `codex -c ...`.
 
 ## Security
 
